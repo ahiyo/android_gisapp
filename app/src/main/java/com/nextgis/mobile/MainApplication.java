@@ -27,9 +27,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -39,6 +37,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.StandardExceptionParser;
 import com.google.android.gms.analytics.Tracker;
+import com.joshdholtz.sentry.Sentry;
 import com.nextgis.maplib.api.ILayer;
 import com.nextgis.maplib.datasource.Field;
 import com.nextgis.maplib.map.LayerGroup;
@@ -56,7 +55,6 @@ import com.nextgis.maplibui.mapui.TrackLayerUI;
 import com.nextgis.maplibui.mapui.VectorLayerUI;
 import com.nextgis.maplibui.util.SettingsConstantsUI;
 import com.nextgis.mobile.activity.SettingsActivity;
-import com.nextgis.mobile.fragment.SettingsFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,9 +64,9 @@ import java.util.List;
 import static com.nextgis.maplib.util.Constants.DEBUG_MODE;
 import static com.nextgis.maplib.util.Constants.MAP_EXT;
 import static com.nextgis.maplib.util.GeoConstants.TMSTYPE_OSM;
-import static com.nextgis.mobile.util.SettingsConstants.AUTHORITY;
-import static com.nextgis.mobile.util.SettingsConstants.KEY_PREF_APP_VERSION;
-import static com.nextgis.mobile.util.SettingsConstants.KEY_PREF_GA;
+import static com.nextgis.mobile.util.AppSettingsConstants.AUTHORITY;
+import static com.nextgis.mobile.util.AppSettingsConstants.KEY_PREF_APP_VERSION;
+import static com.nextgis.mobile.util.AppSettingsConstants.KEY_PREF_GA;
 
 /**
  * Main application class
@@ -86,6 +84,9 @@ public class MainApplication extends GISApplication
 
     @Override
     public void onCreate() {
+        Sentry.init(this, BuildConfig.SENTRY_DSN);
+        Sentry.captureMessage("NGM2 Sentry is init.", Sentry.SentryEventLevel.DEBUG);
+
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         updateFromOldVersion();
 
@@ -122,6 +123,11 @@ public class MainApplication extends GISApplication
     public void sendScreen(String name) {
         mTracker.setScreenName(name);
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
+    @Override
+    public String getAccountsType() {
+        return Constants.NGW_ACCOUNT_TYPE;
     }
 
     @Override
@@ -226,43 +232,23 @@ public class MainApplication extends GISApplication
     @Override
     public void showSettings(String settings)
     {
-        if(TextUtils.isEmpty(settings) || settings.equals(SettingsConstantsUI.ACTION_PREFS_GENERAL)) {
-            Intent intentSet = new Intent(this, SettingsActivity.class);
-            intentSet.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intentSet);
+        if(TextUtils.isEmpty(settings)) {
+            settings = SettingsConstantsUI.ACTION_PREFS_GENERAL;
         }
-        else if(settings.equals(SettingsConstantsUI.ACTION_PREFS_LOCATION)){
-            Intent locationSettings = new Intent(this, SettingsActivity.class);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                locationSettings.setAction(SettingsConstantsUI.ACTION_PREFS_LOCATION);
-            } else {
-                locationSettings.putExtra("settings", "location");
-                locationSettings.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-                locationSettings.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                        SettingsFragment.class.getName());
-                locationSettings.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT_ARGUMENTS,
-                        locationSettings.getExtras());
-            }
 
-            locationSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(locationSettings);
+        switch (settings) {
+            case SettingsConstantsUI.ACTION_PREFS_GENERAL:
+            case SettingsConstantsUI.ACTION_PREFS_LOCATION:
+            case SettingsConstantsUI.ACTION_PREFS_TRACKING:
+                break;
+            default:
+                return;
         }
-        else if(settings.equals(SettingsConstantsUI.ACTION_PREFS_TRACKING)){
-            Intent locationSettings = new Intent(this, SettingsActivity.class);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                locationSettings.setAction(SettingsConstantsUI.ACTION_PREFS_TRACKING);
-            } else {
-                locationSettings.putExtra("settings", "location");
-                locationSettings.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-                locationSettings.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                        SettingsFragment.class.getName());
-                locationSettings.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT_ARGUMENTS,
-                        locationSettings.getExtras());
-            }
 
-            locationSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(locationSettings);
-        }
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.setAction(settings);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

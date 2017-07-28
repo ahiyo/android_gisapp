@@ -35,6 +35,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.nextgis.maplib.util.HttpResponse;
 import com.nextgis.maplibui.util.ControlHelper;
 import com.nextgis.maplibui.util.NGIDUtils;
 import com.nextgis.mobile.BuildConfig;
@@ -133,7 +134,7 @@ public class ApkDownloader extends AsyncTask<String, Integer, String> {
             File apk = new File(mApkPath);
             Uri uri;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                uri = FileProvider.getUriForFile(mActivity, "com.keenfin.easypicker.provider", apk);
+                uri = FileProvider.getUriForFile(mActivity, BuildConfig.APPLICATION_ID + ".easypicker.provider", apk);
                 install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else
                 uri = Uri.fromFile(apk);
@@ -170,12 +171,12 @@ public class ApkDownloader extends AsyncTask<String, Integer, String> {
             return;
         }
 
-        NGIDUtils.get(activity, SettingsConstants.APK_VERSION_UPDATE, new NGIDUtils.OnFinish() {
+        NGIDUtils.get(activity, AppSettingsConstants.APK_VERSION_UPDATE, new NGIDUtils.OnFinish() {
             @Override
-            public void onFinish(String data) {
-                if (data != null) {
+            public void onFinish(HttpResponse response) {
+                if (response.isOk()) {
                     try {
-                        JSONObject json = new JSONObject(data);
+                        JSONObject json = new JSONObject(response.getResponseBody());
                         if (json.getInt("versionCode") <= BuildConfig.VERSION_CODE) {
                             if (showToast) {
                                 Toast.makeText(activity, R.string.update_no, Toast.LENGTH_SHORT).show();

@@ -1,13 +1,15 @@
 /*
  * Project:  NextGIS Mobile
  * Purpose:  Mobile GIS for Android.
+ * Author:   Dmitry Baryshnikov (aka Bishop), bishop.dev@gmail.com
+ * Author:   NikitaFeodonit, nfeodonit@yandex.com
  * Author:   Stanislav Petriakov, becomeglory@gmail.com
  * *****************************************************************************
- * Copyright (c) 2016 NextGIS, info@nextgis.com
+ * Copyright (c) 2012-2017 NextGIS, info@nextgis.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -22,10 +24,11 @@
 package com.nextgis.mobile.util;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
+import android.support.v7.preference.EditTextPreference;
 import android.util.AttributeSet;
 
-public class IntEditTextPreference extends EditTextPreference {
+public class IntEditTextPreference extends EditTextPreference
+{
 	public IntEditTextPreference(Context context) {
 		super(context);
 	}
@@ -38,7 +41,16 @@ public class IntEditTextPreference extends EditTextPreference {
 		super(context, attrs, defStyle);
 	}
 
-	@Override
+    public IntEditTextPreference(
+            Context context,
+            AttributeSet attrs,
+            int defStyleAttr,
+            int defStyleRes)
+    {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    @Override
 	public String getPersistedString(String defaultReturnValue) {
 		return String.valueOf(getPersistedInt(-1));
 	}

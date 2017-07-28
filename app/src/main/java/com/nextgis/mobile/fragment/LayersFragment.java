@@ -72,7 +72,6 @@ import com.nextgis.mobile.activity.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nextgis.maplib.util.Constants.NGW_ACCOUNT_TYPE;
 import static com.nextgis.maplib.util.Constants.TAG;
 import static com.nextgis.maplibui.util.ConstantsUI.GA_CREATE;
 import static com.nextgis.maplibui.util.ConstantsUI.GA_EDIT;
@@ -82,7 +81,7 @@ import static com.nextgis.maplibui.util.ConstantsUI.GA_LAYER;
 import static com.nextgis.maplibui.util.ConstantsUI.GA_LOCAL;
 import static com.nextgis.maplibui.util.ConstantsUI.GA_MENU;
 import static com.nextgis.maplibui.util.ConstantsUI.GA_NGW;
-import static com.nextgis.mobile.util.SettingsConstants.AUTHORITY;
+import static com.nextgis.mobile.util.AppSettingsConstants.AUTHORITY;
 
 /**
  * A layers fragment class
@@ -175,7 +174,7 @@ public class LayersFragment
         final IGISApplication application = (IGISApplication) getActivity().getApplication();
         List<INGWLayer> layers = new ArrayList<>();
 
-        for (Account account : accountManager.getAccountsByType(NGW_ACCOUNT_TYPE)) {
+        for (Account account : accountManager.getAccountsByType(application.getAccountsType())) {
             layers.clear();
             MapContentProviderHelper.getLayersByAccount(application.getMap(), account.name, layers);
 
