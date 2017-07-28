@@ -87,7 +87,7 @@
     <string name="compass_true_north">Afficher le nord vrai</string>
     <string name="compass_magnetic">Afficher le nord magnétique</string>
     <string name="compass_keep_screen">Garder l\'écran du compas allumé</string>
-    <string name="accurate_measures_count">Comptes des mesures GPS</string>
+    <string name="accurate_measures_count">Nombre de mesures GPS</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_attributes">Attributs</string>
     <string name="show_status_panel">Afficher les informations de positionnement</string>
